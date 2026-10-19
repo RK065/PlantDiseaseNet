@@ -13,3 +13,10 @@ venv/
 
 # Dataset
 data/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# Jupyter checkpoint files
+.ipynb_checkpoints/
