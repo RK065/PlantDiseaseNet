@@ -75,6 +75,16 @@ EfficientNet-B0 achieved the best overall test performance:
 - Macro recall: **92.46%**
 - Macro F1-score: **92.45%**
 
+### Confusion Matrices
+
+#### MobileNetV2
+
+![MobileNetV2 Confusion Matrix](reports/mobilenet_v2_confusion_matrix.png)
+
+#### EfficientNet-B0
+
+![EfficientNet-B0 Confusion Matrix](reports/efficientnet_b0_confusion_matrix.png)
+
 It outperformed MobileNetV2 across all four reported metrics and is the current preferred model.
 
 ## Project Structure
