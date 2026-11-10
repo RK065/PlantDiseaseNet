@@ -1,23 +1,31 @@
 
 from pathlib import Path
+import argparse
+import time
 
 import torch
 import torch.nn as nn
 import torch.optim as optim
 
 from src.dataset import create_dataloaders
-from src.model import PlantDiseaseCNN
-from src.utils import set_seed, save_checkpoint, plot_training_history
+from src.model import PlantDiseaseModel
+from src.utils import set_seed, plot_training_history
 
 
-EPOCHS = 5
+EPOCHS = 10
 LEARNING_RATE = 0.001
-CHECKPOINT_PATH = Path("models/best_model.pth")
+CHECKPOINT_DIR = Path("models")
 
 
 def run_epoch(model, loader, criterion, device, optimizer=None):
     training = optimizer is not None
-    model.train() if training else model.eval()
+
+    if training:
+        model.train()
+        # Keep the frozen backbone in evaluation mode.
+        model.model.features.eval()
+    else:
+        model.eval()
 
     total_loss = 0.0
     correct = 0
@@ -40,6 +48,7 @@ def run_epoch(model, loader, criterion, device, optimizer=None):
 
             batch_size = labels.size(0)
             total_loss += loss.item() * batch_size
+
             predictions = outputs.argmax(dim=1)
             correct += (predictions == labels).sum().item()
             total += batch_size
@@ -47,28 +56,44 @@ def run_epoch(model, loader, criterion, device, optimizer=None):
     return total_loss / total, correct / total
 
 
-def train_model():
+def train_model(architecture):
     set_seed(42)
 
     device = torch.device(
         "cuda" if torch.cuda.is_available() else "cpu"
     )
     print("Using device:", device)
+    print("Architecture:", architecture)
 
     train_loader, val_loader, _, classes = create_dataloaders()
 
-    model = PlantDiseaseCNN(num_classes=len(classes)).to(device)
+    model = PlantDiseaseModel(
+        architecture=architecture,
+        num_classes=len(classes)
+    ).to(device)
+
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+
+    # Train only parameters that are not frozen.
+    optimizer = optim.Adam(
+        filter(lambda p: p.requires_grad, model.parameters()),
+        lr=LEARNING_RATE
+    )
 
     history = {
         "train_loss": [],
         "val_loss": [],
         "train_accuracy": [],
-        "val_accuracy": [],
+        "val_accuracy": []
     }
 
     best_val_accuracy = -1.0
+
+    CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
+
+    checkpoint_path = CHECKPOINT_DIR / f"{architecture}_best.pth"
+
+    start_time = time.time()
 
     for epoch in range(EPOCHS):
         train_loss, train_accuracy = run_epoch(
@@ -94,19 +119,38 @@ def train_model():
 
         if val_accuracy > best_val_accuracy:
             best_val_accuracy = val_accuracy
-            save_checkpoint(
-                model,
-                CHECKPOINT_PATH,
-                classes,
-                epoch + 1,
-                val_accuracy,
-            )
-            print("Saved best validation checkpoint.")
+
+            torch.save({
+                "model_state_dict": model.state_dict(),
+                "classes": classes,
+                "architecture": architecture,
+                "epoch": epoch + 1,
+                "val_accuracy": val_accuracy
+            }, checkpoint_path)
+
+            print("Saved best checkpoint:", checkpoint_path)
+
+    training_time = time.time() - start_time
 
     plot_training_history(history)
-    print(f"Best validation accuracy: {best_val_accuracy:.4f}")
-    print(f"Checkpoint: {CHECKPOINT_PATH}")
+
+    print("\nTraining completed!")
+    print("Best validation accuracy:", best_val_accuracy)
+    print("Training time:", round(training_time, 2), "seconds")
+    print("Checkpoint:", checkpoint_path)
 
 
 if __name__ == "__main__":
-    train_model()
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "--model",
+        choices=["mobilenet_v2", "efficientnet_b0"],
+        default="mobilenet_v2"
+    )
+
+    args = parser.parse_args()
+
+    train_model(args.model)
+
+
