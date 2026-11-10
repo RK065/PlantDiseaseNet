@@ -1,9 +1,12 @@
-# Python
-__pycache__/
-*.pyc
-
-# Virtual environment
+# Python environments
 venv/
+.venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.so
 
 # Jupyter
 .ipynb_checkpoints/
@@ -13,10 +16,19 @@ venv/
 
 # Dataset
 data/
+*.zip
 
-# Python cache files
-__pycache__/
-*.py[cod]
+# Model checkpoints
+models/
+*.pth
+*.pt
 
-# Jupyter checkpoint files
-.ipynb_checkpoints/
+# Reports generated locally
+reports/results/
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log

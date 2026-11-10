@@ -75,69 +75,126 @@ EfficientNet-B0 achieved the best overall test performance:
 - Macro recall: **92.46%**
 - Macro F1-score: **92.45%**
 
+Evaluation was performed using a held-out test set. EfficientNet-B0 is currently the preferred architecture based on the reported metrics.
+
 ### Confusion Matrices
 
-#### MobileNetV2
+**MobileNetV2**
 
-![MobileNetV2 Confusion Matrix](reports/mobilenet_v2_confusion_matrix.png)
+![MobileNetV2 Confusion Matrix](reports/figures/mobilenet_v2_confusion_matrix.png)
 
-#### EfficientNet-B0
+**EfficientNet-B0**
 
-![EfficientNet-B0 Confusion Matrix](reports/efficientnet_b0_confusion_matrix.png)
+![EfficientNet-B0 Confusion Matrix](reports/figures/efficientnet_b0_confusion_matrix.png)
 
-It outperformed MobileNetV2 across all four reported metrics and is the current preferred model.
+EfficientNet-B0 outperformed MobileNetV2 across all four reported metrics.
 
 ## Project Structure
 
 ```text
 PlantDiseaseNet/
-├── data/
-│   └── PlantVillage/
+│
+├── app/                    # Model inference application
+├── data/                   # PlantVillage dataset (not tracked)
+├── models/                 # Trained model checkpoints (not tracked)
+│
+├── notebooks/
+│   ├── week1/              # Dataset exploration
+│   ├── week2/              # Preprocessing
+│   ├── week3/              # CNN training
+│   ├── week4/              # Transfer learning
+│   └── week5/              # Trained model experiments
+│
 ├── src/
 │   ├── __init__.py
 │   ├── dataset.py
 │   ├── model.py
 │   ├── train.py
 │   ├── evaluate.py
-│   ├── evaluate_models.py
 │   └── utils.py
-├── week1/
-│   └── dataset_explorer.ipynb
-├── models/
+│
 ├── reports/
-├── requirements.txt
+│   ├── figures/             # Confusion matrices and visualizations
+│   └── results/             # Generated evaluation results
+│
+├── tests/                   # Project tests
 ├── README.md
+├── requirements.txt
 └── .gitignore
 ```
 
-Note: Dataset files and trained model checkpoints are not committed to GitHub.
+**Note:** Dataset files and trained model checkpoints are not committed to GitHub.
+
+## Setup and Installation
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/RK065/PlantDiseaseNet.git
+cd PlantDiseaseNet
+```
+
+### 2. Create a virtual environment
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 3. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Dataset Setup
+
+Download the PlantVillage dataset and place it inside:
+
+```text
+data/PlantVillage/
+```
+
+### 5. Run the Training Pipeline
+
+To train the EfficientNet-B0 model:
+
+```bash
+python -m src.train --model efficientnet_b0
+```
 
 ## Roadmap
 
 ### Week 1 – Dataset Exploration
+
 - Dataset collection and exploration.
 - Initial exploratory data analysis.
 
 ### Week 2 – Preprocessing
+
 - Image resizing and normalization.
 - Dataset splitting and augmentation.
 
 ### Week 3 – Training Pipeline
+
 - CNN training and evaluation pipeline.
 - Reusable dataset and utility modules.
 
 ### Week 4 – Transfer Learning
+
 - MobileNetV2 implementation.
 - EfficientNet-B0 implementation.
 - Training on GPU.
 
 ### Week 5 – Evaluation and Comparison
+
 - Test-set evaluation.
 - Classification reports and confusion matrices.
 - Model performance comparison.
 - Identification of the best-performing architecture.
 
 ### Week 6 – Deployment
+
 - Develop a model inference interface.
 - Explore web application deployment.
 
