@@ -132,7 +132,10 @@ def train_model(architecture):
 
     training_time = time.time() - start_time
 
-    plot_training_history(history)
+    plot_training_history(
+    history,
+    save_path=f"reports/{architecture}_training.png"
+    )
 
     print("\nTraining completed!")
     print("Best validation accuracy:", best_val_accuracy)
